@@ -2,7 +2,7 @@
 import turtle
 import constants as cons
 import paddle
-
+import ball
 
 class PongGame:
     """Pong game"""
@@ -11,6 +11,8 @@ class PongGame:
         self.game_on = True
         self.paddles: list[paddle.Paddle] = []
         self.initialize_paddles()
+        self.initialize_middle_ground()
+        self.pong_ball = ball.Ball(self.paddles)
         self.game_loop()
 
 
@@ -26,8 +28,8 @@ class PongGame:
         """Initiliazes paddles"""
         paddle1 = paddle.Paddle()
         paddle2 = paddle.Paddle()
-        paddle1.goto(x=cons.FIRST_PADDLE_XCOOR,y=cons.FIRST_PADDLE_YCOOR)
-        paddle2.goto(x=cons.SECOND_PADDLE_XCOOR,y=cons.SECOND_PADDLE_YCOOR)
+        paddle1.goto(x=cons.RIGHT_PADDLE_XCOOR,y=cons.RIGHT_PADDLE_YCOOR)
+        paddle2.goto(x=cons.LEFT_PADDLE_XCOOR,y=cons.LEFT_PADDLE_YCOOR)
         self.paddles.extend([paddle1,paddle2])
         self.initialize_paddle_motion()
 
@@ -39,10 +41,26 @@ class PongGame:
         self.screen.onkey(self.paddles[1].move_paddle_up,"w")
         self.screen.onkey(self.paddles[1].move_paddle_down,"s")
 
+    def initialize_middle_ground(self):
+        """Creates a dashed line that separates the paddles"""
+        middle_ground = turtle.Turtle()
+        middle_ground.color("white")
+        middle_ground.penup()
+        middle_ground.goto(x=0,y=cons.MAX_SCREEN_YCOOR)
+        middle_ground.setheading(270)
+        middle_ground.pendown()
+        while middle_ground.ycor() != cons.MIN_SCREEN_YCOOR:
+            middle_ground.forward(cons.MIDDLE_SPACE)
+            middle_ground.penup()
+            middle_ground.forward(cons.MIDDLE_SPACE)
+            middle_ground.pendown()
+
     def game_loop(self):
         """Runs Pong on loop"""
         if not self.game_on:
             return
+
+        self.pong_ball.move()
         self.screen.update()
         self.screen.ontimer(self.game_loop,16)
 
