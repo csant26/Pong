@@ -24,3 +24,4 @@ class Paddle(turtle.Turtle):
         if new_y < cons.PADDLE_MIN_YCOOR:
             new_y = cons.PADDLE_MIN_YCOOR
         self.sety(new_y)
+    

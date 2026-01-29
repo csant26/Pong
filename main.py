@@ -1,8 +1,10 @@
 """Main module"""
 import turtle
+import tkinter.messagebox as msg
 import constants as cons
 import paddle
 import ball
+import scoreboard
 
 class PongGame:
     """Pong game"""
@@ -12,7 +14,8 @@ class PongGame:
         self.paddles: list[paddle.Paddle] = []
         self.initialize_paddles()
         self.initialize_middle_ground()
-        self.pong_ball = ball.Ball(self.paddles)
+        self.pong_ball = ball.Ball()
+        self.score = scoreboard.Scoreboard()
         self.game_loop()
 
 
@@ -58,9 +61,35 @@ class PongGame:
     def game_loop(self):
         """Runs Pong on loop"""
         if not self.game_on:
+            self.screen.bye()
             return
 
         self.pong_ball.move()
+
+        if self.pong_ball.ycor() >= cons.MAX_BALL_YCOOR or \
+            self.pong_ball.ycor() <= cons.MIN_BALL_YCOOR:
+            self.pong_ball.bounce_y()
+
+        right_paddle = self.paddles[0]
+        left_paddle = self.paddles[1]
+
+        if self.pong_ball.distance(right_paddle) < 50 and self.pong_ball.xcor() > 340 or \
+        self.pong_ball.distance(left_paddle) < 50 and self.pong_ball.xcor() < -340:
+            self.pong_ball.bounce_x()
+
+        if self.pong_ball.xcor() > 360:
+            self.score.left_point()
+            self.pong_ball.reset_position()
+        
+        if self.pong_ball.xcor() < -360:
+            self.score.right_point()
+            self.pong_ball.reset_position()
+        
+        (is_final,winner) = self.score.has_reached_finale()
+        if is_final:
+            msg.showinfo("WINNER",f"{winner} has won the game.")
+            self.game_on = False
+
         self.screen.update()
         self.screen.ontimer(self.game_loop,16)
 

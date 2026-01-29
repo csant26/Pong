@@ -6,30 +6,32 @@ import constants as cons
 
 class Ball(turtle.Turtle):
     """Ball"""
-    def __init__(self,paddles):
+    def __init__(self):
         super().__init__()
         self.shape(cons.BALL_SHAPE)
         self.color(cons.BALL_COLOR)
         self.penup()
         self.shapesize(stretch_len=0.5,stretch_wid=0.5)
-        self.dx = 2
-        self.dy = 2
-        self.paddles = paddles
+        self.dx = cons.BALL_PACE
+        self.dy = cons.BALL_PACE
 
     def move(self):
         """Move ball and bounce only if it hits a paddle"""
         self.goto(self.xcor() + self.dx, self.ycor() + self.dy)
 
-        # Bounce vertically
-        if self.ycor() >= cons.MAX_BALL_YCOOR or self.ycor() <= cons.MIN_BALL_YCOOR:
-            self.dy *= -1
+    # def move(self,x,y):
+    #      """Move ball and bounce only if it hits a paddle"""
+    #      self.goto(self.xcor() + x, self.ycor() + y)
 
-        right_paddle = self.paddles[0]
-        left_paddle = self.paddles[1]
+    def bounce_y(self):
+        """Bounce vertically"""
+        self.dy *= -1
 
-        if self.distance(right_paddle) < 50 and self.xcor() > 340 or \
-        self.distance(left_paddle) < 50 and self.xcor() < -340:
-            self.dx *=-1
-
-        # if self.xcor() >= cons.MAX_BALL_XCOOR or self.xcor() <= cons.MIN_BALL_XCOOR:
-        #     self.dx *= -1
+    def bounce_x(self):
+        """"Bounce horizontally"""
+        self.dx *=-1
+    
+    def reset_position(self):
+        """Reset ball position afte collision with paddle"""
+        self.goto(0,0)
+        self.bounce_x()
